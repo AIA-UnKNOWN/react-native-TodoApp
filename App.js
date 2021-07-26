@@ -6,8 +6,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  FlatList,
-  ScrollView
+  FlatList
 } from 'react-native';
 
 
@@ -40,7 +39,7 @@ function TodoInputField({ currentTodoValue, onInputChange, onAdd }) {
   );
 }
 
-const TodosWrapperButtons = () => {
+const TodosWrapperButtons = ({ onSectionButtonClick }) => {
   const [ clicked, setClicked ] = useState('Todos');
 
   const todosWrapperButton = styles.todosWrapperButton;
@@ -50,6 +49,7 @@ const TodosWrapperButtons = () => {
 
   const buttonClick = buttonName => {
     setClicked(buttonName);
+    onSectionButtonClick(buttonName);
   }
 
   return (
@@ -84,7 +84,7 @@ const TodosWrapperButtons = () => {
   );
 }
 
-function Todos({ todos, onDelete, onDone }) {
+function Todos({ todos, onDelete, onDone, onButtonClick }) {
   const todosWrapper = styles.todosWrapper;
   const todosWrapperContent = styles.todosWrapperContent;
 
@@ -92,7 +92,7 @@ function Todos({ todos, onDelete, onDone }) {
     return (
       <View style={todosWrapper}>
         <View style={todosWrapperContent}>
-          <TodosWrapperButtons />
+          <TodosWrapperButtons onSectionButtonClick={onButtonClick} />
           <View style={styles.noTodosContainer}>
             <Text style={styles.noTodosMessage}>No todos yet</Text>
           </View>
@@ -160,6 +160,10 @@ function App() {
   const [ todos, setTodos ] = useState([]);
   const [ doneItems, setDoneItems ] = useState([]);
 
+  const onButtonClick = buttonName => {
+    setCurrentButton(buttonName);
+  }
+
   const addTodo = () => {
     if (currentInput === '') {
       return;
@@ -194,6 +198,7 @@ function App() {
       />
       <Todos
         todos={todos}
+        onButtonClick={onButtonClick}
         onDelete={onDeleteTodo}
         onDone={onDoneTodo}
       />
