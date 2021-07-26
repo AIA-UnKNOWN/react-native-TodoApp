@@ -39,52 +39,15 @@ function TodoInputField({ currentTodoValue, onInputChange, onAdd }) {
   );
 }
 
-const TodosWrapperButtons = ({ onSectionButtonClick }) => {
-  const [ clicked, setClicked ] = useState('Todos');
-
-  const todosWrapperButton = styles.todosWrapperButton;
-  const todosWrapperButtonText = styles.todosWrapperButtonText;
-  const todosWrapperButtonClicked = styles.todosWrapperButtonClicked;
-  const todosWrapperButtonTextClicked = styles.todosWrapperButtonTextClicked;
-
-  const buttonClick = buttonName => {
-    setClicked(buttonName);
-    onSectionButtonClick(buttonName);
-  }
-
+const TodosWrapperButtons = ({ children }) => {
   return (
     <View style={styles.todosWrapperButtons}>
-      <TouchableOpacity
-        style={clicked === 'Todos' ?
-          [todosWrapperButton, todosWrapperButtonClicked] : todosWrapperButton
-        }
-        onPress={() => buttonClick('Todos')}
-      >
-        <Text
-          style={clicked === 'Todos' ? todosWrapperButtonTextClicked : todosWrapperButtonText
-          }
-        >
-          Todos
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={clicked === 'Done' ?
-          [todosWrapperButton, todosWrapperButtonClicked] : todosWrapperButton
-        }
-        onPress={() => buttonClick('Done')}
-      >
-        <Text
-          style={clicked === 'Done' ? todosWrapperButtonTextClicked : todosWrapperButtonText
-          }
-        >
-          Done
-        </Text>
-      </TouchableOpacity>
+      {children}
     </View>
   );
 }
 
-function Todos({ todos, onDelete, onDone, onButtonClick }) {
+function Todos({ todos, onDelete, onDone, children }) {
   const todosWrapper = styles.todosWrapper;
   const todosWrapperContent = styles.todosWrapperContent;
 
@@ -92,7 +55,9 @@ function Todos({ todos, onDelete, onDone, onButtonClick }) {
     return (
       <View style={todosWrapper}>
         <View style={todosWrapperContent}>
-          <TodosWrapperButtons onSectionButtonClick={onButtonClick} />
+          <TodosWrapperButtons>
+            {children}
+          </TodosWrapperButtons>
           <View style={styles.noTodosContainer}>
             <Text style={styles.noTodosMessage}>No todos yet</Text>
           </View>
@@ -140,7 +105,9 @@ function Todos({ todos, onDelete, onDone, onButtonClick }) {
   return (
     <View style={todosWrapper}>
       <View style={todosWrapperContent}>
-        <TodosWrapperButtons/>
+        <TodosWrapperButtons>
+          {children}
+        </TodosWrapperButtons>
         <FlatList
           style={styles.todosContainer}
           data={todos}
@@ -160,7 +127,7 @@ function App() {
   const [ todos, setTodos ] = useState([]);
   const [ doneItems, setDoneItems ] = useState([]);
 
-  const onButtonClick = buttonName => {
+  const buttonClick = buttonName => {
     setCurrentButton(buttonName);
   }
 
@@ -186,7 +153,13 @@ function App() {
     const currentDoneItems = doneItems;
     currentDoneItems.push(text);
     setDoneItems(currentDoneItems);
+    onDeleteTodo(text);
   }
+
+  const todosWrapperButton = styles.todosWrapperButton;
+  const todosWrapperButtonText = styles.todosWrapperButtonText;
+  const todosWrapperButtonClicked = styles.todosWrapperButtonClicked;
+  const todosWrapperButtonTextClicked = styles.todosWrapperButtonTextClicked;
 
   return (
     <View style={styles.app}>
@@ -197,11 +170,37 @@ function App() {
         onAdd={addTodo}
       />
       <Todos
-        todos={todos}
-        onButtonClick={onButtonClick}
+        todos={currentButton === 'Todos' ? todos : doneItems}
         onDelete={onDeleteTodo}
         onDone={onDoneTodo}
-      />
+      >
+        <TouchableOpacity
+          style={currentButton === 'Todos' ?
+            [todosWrapperButton, todosWrapperButtonClicked] : todosWrapperButton
+          }
+          onPress={() => buttonClick('Todos')}
+        >
+          <Text
+            style={currentButton === 'Todos' ? todosWrapperButtonTextClicked : todosWrapperButtonText
+            }
+          >
+            Todos
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={currentButton === 'Done' ?
+            [todosWrapperButton, todosWrapperButtonClicked] : todosWrapperButton
+          }
+          onPress={() => buttonClick('Done')}
+        >
+          <Text
+            style={currentButton === 'Done' ? todosWrapperButtonTextClicked : todosWrapperButtonText
+            }
+          >
+            Done
+          </Text>
+        </TouchableOpacity>
+      </Todos>
     </View>
   );
 }
